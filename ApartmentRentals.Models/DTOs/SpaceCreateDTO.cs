@@ -31,7 +31,6 @@ namespace ApartmentRentals.Main.DTOs
         public List<SpacePhoto> Photos { get; set; } = new();
 
         // Связи
-        public string LandlordId { get; set; } = string.Empty;
-        public DateTime PublishedAt { get; set; } = DateTime.UtcNow;
+        public int LandlordId { get; set; } = 0;
     }
 }

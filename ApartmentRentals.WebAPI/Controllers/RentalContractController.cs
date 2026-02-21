@@ -50,7 +50,7 @@ public class RentalContractController : ControllerBase
         var RentalContract = _mapper.Map<RentalContract>(dto);
         RentalContract.Id = id;
 
-        var success = await _repository.Update(RentalContract);
+        var success = await _repository.UpdateAsync(RentalContract);
 
         return success ? NoContent() : NotFound();
     }
@@ -58,7 +58,7 @@ public class RentalContractController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var success = await _repository.DeleteById(id);
+        var success = await _repository.DeleteByIdAsync(id);
 
         return success ? NoContent() : NotFound();
     }

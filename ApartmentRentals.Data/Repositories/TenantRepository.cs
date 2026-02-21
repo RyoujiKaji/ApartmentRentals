@@ -1,6 +1,5 @@
 ﻿using ApartmentRentals.Main.Models;
 using ApartmentRentals.Main.Repositories;
-using System.Diagnostics.Contracts;
 
 namespace ApartmentRentals.Data.Repositories
 {
@@ -8,49 +7,48 @@ namespace ApartmentRentals.Data.Repositories
     {
         private readonly List<Tenant> _tenants = [
             new Tenant {
-                Id = 1, Name = "Алексей", Surname = "Сидоров",
+                Id = 1, Name = "Алексей", Surname = "Сидоров", MiddleName = "Олегович",
                 HasPets = true, HasChildren = false
             }
         ];
 
         private static int _nextId = 2;
 
-        public async Task<IEnumerable<Tenant>> GetAllAsync() => await Task.FromResult(_tenants);
+        public Task<IEnumerable<Tenant>> GetAllAsync() => Task.FromResult<IEnumerable<Tenant>>(_tenants);
 
-        public async Task<Tenant?> GetByIdAsync(int id) =>
-            await Task.FromResult(_tenants.FirstOrDefault(t => t.Id == id));
+        public Task<Tenant?> GetByIdAsync(int id) => Task.FromResult(_tenants.FirstOrDefault(t => t.Id == id));
 
-        public async Task CreateAsync(Tenant entity)
+        public Task CreateAsync(Tenant entity)
         {
             entity.Id = _nextId++;
             _tenants.Add(entity);
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
 
-        public async Task<bool> Update(Tenant entity)
+        public Task<bool> UpdateAsync(Tenant entity)
         {
             var index = _tenants.FindIndex(s => s.Id == entity.Id);
 
             if (index == -1)
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             _tenants[index] = entity;
-            return true;
+            return Task.FromResult(true);
         }
 
-        public async Task<bool> DeleteById(int id)
+        public Task<bool> DeleteByIdAsync(int id)
         {
             var tenant = _tenants.FirstOrDefault(l => l.Id == id);
 
             if (tenant == null)
             {
-                return false;
-            }
+                return Task.FromResult(false);
+            }   
 
             _tenants.Remove(tenant);
-            return true;
+            return Task.FromResult(true);
         }
     }
 }

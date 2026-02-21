@@ -56,51 +56,43 @@ namespace ApartmentRentals.Data.Repositories
             }
         ];
 
-        // Используем string для ID, чтобы потом было легче переехать на MongoDB (там ObjectId — это строка)
         private static int _nextId = 3;
 
-        public async Task<IEnumerable<Space>> GetAllAsync()
-        {
-            return await Task.FromResult(_spaces);
-        }
+        public Task<IEnumerable<Space>> GetAllAsync() => Task.FromResult<IEnumerable<Space>>(_spaces);
 
-        public async Task<Space?> GetByIdAsync(int id)
-        {
-            var space = _spaces.FirstOrDefault(s => s.Id == id);
-            return await Task.FromResult(space);
-        }
+        public Task<Space?> GetByIdAsync(int id) => Task.FromResult(_spaces.FirstOrDefault(s => s.Id == id));
 
-        public async Task CreateAsync(Space entity)
+        public Task CreateAsync(Space entity)
         {
             entity.Id = _nextId++;
             _spaces.Add(entity);
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
 
-        public async Task<bool> Update(Space entity)
+        public Task<bool> UpdateAsync(Space entity)
         {
             var index = _spaces.FindIndex(s => s.Id == entity.Id);
 
             if (index == -1)
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             _spaces[index] = entity;
-            return true;
+            return Task.FromResult(true);
         }
 
-        public async Task<bool> DeleteById(int id)
+        public Task<bool> DeleteByIdAsync(int id)
         {
             var space = _spaces.FirstOrDefault(l => l.Id == id);
 
             if (space == null)
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             _spaces.Remove(space);
-            return true;
+            return Task.FromResult(true);
         }
     }
 }

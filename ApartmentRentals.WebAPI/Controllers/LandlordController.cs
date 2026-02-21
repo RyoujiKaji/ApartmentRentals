@@ -50,7 +50,7 @@ public class LandlordController : ControllerBase
         var landlord = _mapper.Map<Landlord>(dto);
         landlord.Id = id;
 
-        var success = await _repository.Update(landlord);
+        var success = await _repository.UpdateAsync(landlord);
 
         return success ? NoContent() : NotFound();
     }
@@ -58,7 +58,7 @@ public class LandlordController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var success = await _repository.DeleteById(id);
+        var success = await _repository.DeleteByIdAsync(id);
 
         return success ? NoContent() : NotFound();
     }

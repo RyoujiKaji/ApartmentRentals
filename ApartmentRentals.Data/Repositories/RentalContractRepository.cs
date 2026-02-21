@@ -14,42 +14,43 @@ namespace ApartmentRentals.Data.Repositories
 
         private static int _nextId = 2;
 
-        public async Task<IEnumerable<RentalContract>> GetAllAsync() => await Task.FromResult(_contracts);
+        public Task<IEnumerable<RentalContract>> GetAllAsync() => Task.FromResult<IEnumerable<RentalContract>>(_contracts);
 
-        public async Task<RentalContract?> GetByIdAsync(int id) =>
-            await Task.FromResult(_contracts.FirstOrDefault(c => c.Id == id));
+        public Task<RentalContract?> GetByIdAsync(int id) =>
+            Task.FromResult(_contracts.FirstOrDefault(c => c.Id == id));
 
-        public async Task CreateAsync(RentalContract entity)
+        public Task CreateAsync(RentalContract entity)
         {
             entity.Id = _nextId++;
             _contracts.Add(entity);
-            await Task.CompletedTask;
+
+            return Task.CompletedTask;
         }
 
-        public async Task<bool> Update(RentalContract entity)
+        public Task<bool> UpdateAsync(RentalContract entity)
         {
             var index = _contracts.FindIndex(s => s.Id == entity.Id);
 
             if (index == -1)
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             _contracts[index] = entity;
-            return true;
+            return Task.FromResult(true);
         }
 
-        public async Task<bool> DeleteById(int id)
+        public Task<bool> DeleteByIdAsync(int id)
         {
             var contract = _contracts.FirstOrDefault(l => l.Id == id);
 
             if (contract == null)
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             _contracts.Remove(contract);
-            return true;
+            return Task.FromResult(true);
         }
     }
 }

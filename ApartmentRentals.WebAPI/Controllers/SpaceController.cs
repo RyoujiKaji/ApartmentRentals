@@ -58,7 +58,7 @@ namespace ApartmentRentals.WebAPI.Controllers
             var space = _mapper.Map<Space>(s);
             space.Id = id;
 
-            var res = await _repository.Update(space);
+            var res = await _repository.UpdateAsync(space);
 
             return res ? NoContent() : NotFound();
         }
@@ -67,7 +67,7 @@ namespace ApartmentRentals.WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            bool res = await _repository.DeleteById(id);
+            bool res = await _repository.DeleteByIdAsync(id);
 
             return res ? NoContent() : NotFound();
         }
