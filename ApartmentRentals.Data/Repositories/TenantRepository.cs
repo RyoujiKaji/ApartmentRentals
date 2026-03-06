@@ -3,11 +3,11 @@ using ApartmentRentals.Main.Repositories;
 
 namespace ApartmentRentals.Data.Repositories
 {
-    public class TenantRepository : IRepository<Tenant>
+    public class TenantRepository //: IRepository<Tenant>
     {
         private readonly List<Tenant> _tenants = [
             new Tenant {
-                Id = 1, Name = "Алексей", Surname = "Сидоров", MiddleName = "Олегович",
+                Id = "1", Name = "Алексей", Surname = "Сидоров", MiddleName = "Олегович",
                 HasPets = true, HasChildren = false
             }
         ];
@@ -16,11 +16,11 @@ namespace ApartmentRentals.Data.Repositories
 
         public Task<IEnumerable<Tenant>> GetAllAsync() => Task.FromResult<IEnumerable<Tenant>>(_tenants);
 
-        public Task<Tenant?> GetByIdAsync(int id) => Task.FromResult(_tenants.FirstOrDefault(t => t.Id == id));
+        public Task<Tenant?> GetByIdAsync(string id) => Task.FromResult(_tenants.FirstOrDefault(t => t.Id == id));
 
         public Task CreateAsync(Tenant entity)
         {
-            entity.Id = _nextId++;
+            entity.Id = Convert.ToString(_nextId++);
             _tenants.Add(entity);
             return Task.CompletedTask;
         }
@@ -38,7 +38,7 @@ namespace ApartmentRentals.Data.Repositories
             return Task.FromResult(true);
         }
 
-        public Task<bool> DeleteByIdAsync(int id)
+        public Task<bool> DeleteByIdAsync(string id)
         {
             var tenant = _tenants.FirstOrDefault(l => l.Id == id);
 

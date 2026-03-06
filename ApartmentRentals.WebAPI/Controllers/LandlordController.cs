@@ -3,31 +3,34 @@ using ApartmentRentals.Main.Models;
 using ApartmentRentals.Main.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using SpaceStoreApi.Services;
 
 [Route("api/[controller]")]
 [ApiController]
 public class LandlordController : ControllerBase
 {
-    private readonly IRepository<Landlord> _repository;
+    //private readonly IRepository<Landlord> _repository;
+    private readonly LandlordService _landlordService;
     private readonly IMapper _mapper;
 
-    public LandlordController(IRepository<Landlord> repository, IMapper mapper)
+    public LandlordController(LandlordService landlordService, IMapper mapper)
     {
-        _repository = repository;
+        //_repository = repository;
+        _landlordService = landlordService;
         _mapper = mapper;
     }
 
     [HttpGet]
     public async Task<ActionResult<List<Landlord>>> GetAllAsync()
     {
-        var l = await _repository.GetAllAsync();
+        var l = await _landlordService.GetAllAsync();
         return l.ToList();
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Landlord>> GetAsync(int id)
+    public async Task<ActionResult<Landlord>> GetAsync(string id)
     {
-        var landlord = await _repository.GetByIdAsync(id);
+        var landlord = await _landlordService.GetByIdAsync(id);
 
         if (landlord == null) return NotFound();
 
@@ -39,26 +42,26 @@ public class LandlordController : ControllerBase
     {
         var landlord = _mapper.Map<Landlord>(dto);
 
-        await _repository.CreateAsync(landlord);
+        await _landlordService.CreateAsync(landlord);
 
         return CreatedAtAction(nameof(GetAsync), new { id = landlord.Id }, landlord);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, LandlordDTO dto)
+    public async Task<IActionResult> UpdateAsync(string id, LandlordDTO dto)
     {
         var landlord = _mapper.Map<Landlord>(dto);
         landlord.Id = id;
 
-        var success = await _repository.UpdateAsync(landlord);
+        var success = await _landlordService.UpdateAsync(id, landlord);
 
         return success ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(string id)
     {
-        var success = await _repository.DeleteByIdAsync(id);
+        var success = await _landlordService.Delete(id);
 
         return success ? NoContent() : NotFound();
     }

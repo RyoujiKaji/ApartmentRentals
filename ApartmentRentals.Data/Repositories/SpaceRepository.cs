@@ -9,7 +9,7 @@ namespace ApartmentRentals.Data.Repositories
         [
             new Space
             {
-                Id = 1,
+                Id = "1",
                 Title = "Уютная двухкомнатная квартира в центре",
                 Category = SpaceType.Apartment,
                 Address = "Москва, ул. Тверская, д. 12, кв. 45",
@@ -23,7 +23,7 @@ namespace ApartmentRentals.Data.Repositories
                 Material = HouseType.Brick,
                 AllowsChildren = true,
                 AllowsPets = false,
-                LandlordId = 1,
+                LandlordId = "0",
                 Photos = new List<SpacePhoto>
                 {
                     new SpacePhoto { Url = "https://example.com/photo1.jpg", Description = "Гостиная", IsMain = true },
@@ -33,7 +33,7 @@ namespace ApartmentRentals.Data.Repositories
             },
             new Space
             {
-                Id = 2,
+                Id = "2",
                 Title = "Светлая комната для студента",
                 Category = SpaceType.Room,
                 Address = "Санкт-Петербург, пр. Просвещения, д. 5",
@@ -47,7 +47,7 @@ namespace ApartmentRentals.Data.Repositories
                 Material = HouseType.Panel,
                 AllowsChildren = false,
                 AllowsPets = true,
-                LandlordId = 2,
+                LandlordId = "1",
                 Photos = new List<SpacePhoto>
                 {
                     new SpacePhoto { Url = "https://example.com/photo3.jpg", Description = "Вид из окна", IsMain = true }
@@ -60,11 +60,11 @@ namespace ApartmentRentals.Data.Repositories
 
         public Task<IEnumerable<Space>> GetAllAsync() => Task.FromResult<IEnumerable<Space>>(_spaces);
 
-        public Task<Space?> GetByIdAsync(int id) => Task.FromResult(_spaces.FirstOrDefault(s => s.Id == id));
+        public Task<Space?> GetByIdAsync(string id) => Task.FromResult(_spaces.FirstOrDefault(s => s.Id == id));
 
         public Task CreateAsync(Space entity)
         {
-            entity.Id = _nextId++;
+            entity.Id = Convert.ToString(_nextId++);
             _spaces.Add(entity);
             return Task.CompletedTask;
         }
@@ -82,7 +82,7 @@ namespace ApartmentRentals.Data.Repositories
             return Task.FromResult(true);
         }
 
-        public Task<bool> DeleteByIdAsync(int id)
+        public Task<bool> DeleteByIdAsync(string id)
         {
             var space = _spaces.FirstOrDefault(l => l.Id == id);
 

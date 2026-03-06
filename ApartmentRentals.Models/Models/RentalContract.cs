@@ -1,13 +1,21 @@
-﻿namespace ApartmentRentals.Main.Models
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System.Text.Json.Serialization;
+
+namespace ApartmentRentals.Main.Models
 {
     public class RentalContract
     {
-        public int Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)] 
+        public string Id { get; set; }
 
-        public int SpaceId { get; set; } = 0;
-        public int TenantId { get; set; } = 0;
+        public string SpaceId { get; set; } = "0";
+        public string TenantId { get; set; } = "0";
 
+        [BsonElement("startDate")]
         public DateTime StartDate { get; set; }
+        [BsonElement("endDate")]
         public DateTime EndDate { get; set; }
         //public decimal FinalPrice { get; set; } //Итоговая цена
     }

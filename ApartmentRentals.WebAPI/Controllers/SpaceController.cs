@@ -3,6 +3,7 @@ using ApartmentRentals.Main.Models;
 using ApartmentRentals.Main.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using SpaceStoreApi.Services;
 
 namespace ApartmentRentals.WebAPI.Controllers
 {
@@ -10,18 +11,25 @@ namespace ApartmentRentals.WebAPI.Controllers
     [ApiController]
     public class SpaceController : ControllerBase
     {
-        private readonly IRepository<Space> _repository;
+
+        private readonly SpaceService _spaceService;
         private readonly IMapper _mapper;
-        public SpaceController(IRepository<Space> repository, IMapper mapper)
+
+        public SpaceController(SpaceService spaceService, IMapper mapper){
+             _spaceService = spaceService;
+             _mapper = mapper;
+        }
+        //private readonly IRepository<Space> _repository;
+       /* public SpaceController(IRepository<Space> repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;
-        }
+        }*/
 
         [HttpGet]
         public async Task<IActionResult> GetAllAsync([FromQuery] bool full = false)
         {
-            var res = await _repository.GetAllAsync();
+            var res = await _spaceService.GetAllAsync();
 
             if (full)
             {
@@ -33,9 +41,9 @@ namespace ApartmentRentals.WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Space>> GetAsync(int id)
+        public async Task<ActionResult<Space>> GetAsync(string id)
         {
-            var space = await _repository.GetByIdAsync(id);
+            var space = await _spaceService.GetByIdAsync(id);
 
             if (space == null) return NotFound();
 
@@ -47,27 +55,27 @@ namespace ApartmentRentals.WebAPI.Controllers
         {
             var space = _mapper.Map<Space>(s);
 
-            await _repository.CreateAsync(space);
+            await _spaceService.CreateAsync(space);
 
             return CreatedAtAction(nameof(GetAsync), new { id = space.Id }, space);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync (int id, SpaceCreateDTO s)
+        public async Task<IActionResult> UpdateAsync (string id, SpaceCreateDTO s)
         {
             var space = _mapper.Map<Space>(s);
             space.Id = id;
 
-            var res = await _repository.UpdateAsync(space);
+            var res = await _spaceService.UpdateAsync(id, space);
 
             return res ? NoContent() : NotFound();
         }
 
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string id)
         {
-            bool res = await _repository.DeleteByIdAsync(id);
+            bool res = await _spaceService.Delete(id);
 
             return res ? NoContent() : NotFound();
         }

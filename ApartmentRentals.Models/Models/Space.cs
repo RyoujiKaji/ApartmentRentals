@@ -1,4 +1,8 @@
-﻿namespace ApartmentRentals.Main.Models
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System.Text.Json.Serialization;
+
+namespace ApartmentRentals.Main.Models
 {
     public enum SpaceType { Apartment, Room, BedPlace, House, PartOfHouse}
     public enum HouseType { Brick, Wooden, Monolithic, Panel, Block, Stalinka }
@@ -20,14 +24,23 @@
 
     public class Space
     {
-        public int Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)] 
+        public string Id { get; set; }
 
+        [BsonElement("category")]
         public SpaceType Category { get; set; }
+        [BsonElement("title")]
         public string Title { get; set; } = string.Empty;
+        [BsonElement("address")]
         public string Address { get; set; } = string.Empty;
 
+        [BsonElement("roomCount")]
         public int RoomCount { get; set; }
+
+        [BsonElement("price")]
         public decimal Price { get; set; }
+        [BsonElement("term")]
         public RentalTerm Term { get; set; }
 
         public Area Area { get; set; } = new();
@@ -42,7 +55,8 @@
 
         public List<SpacePhoto> Photos { get; set; } = new();
 
-        public int LandlordId { get; set; } = 0;
+        [BsonElement("LandlordId")]
+        public string LandlordId { get; set; } = "0";
         public DateTime PublishedAt { get; set; } = DateTime.Now;
     }
 }

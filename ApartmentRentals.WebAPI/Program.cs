@@ -3,47 +3,70 @@ using ApartmentRentals.Main.Models;
 using ApartmentRentals.Main.Repositories;
 using ApartmentRentals.Models;
 
-var builder = WebApplication.CreateBuilder(args);
+using SpaceStoreApi.Services;
 
-// Add services to the container.
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ApartmentRentals.Tests")]
 
-//builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+    var builder = WebApplication.CreateBuilder(args);
 
-// Настраиваем авто маппер
-builder.Services.AddAutoMapper(cfg =>
-{
-    cfg.AddProfile<MappingProfile>();
-});
+    // Add services to the container.
+    builder.Services.Configure<SpaceStoreDatabaseSettings>(
+        builder.Configuration.GetSection("SpaceStoreDatabase"));
 
-// Не отрезай Async в названии
-builder.Services.AddControllers(options =>
-{
-    options.SuppressAsyncSuffixInActionNames = false;
-});
+    builder.Services.AddSingleton<SpaceService>();
+    builder.Services.AddSingleton<RentalContractService>();
+    builder.Services.AddSingleton<TenantService>();
+    builder.Services.AddSingleton<LandlordService>();
 
-// Регистрируем одиночки-репозитории
-// Это сделает класс Одиночкой на всё время работы сервера
-builder.Services.AddSingleton<IRepository<Landlord>, LandlordRepository>();
-builder.Services.AddSingleton<IRepository<RentalContract>, RentalContractRepository>();
-builder.Services.AddSingleton<IRepository<Space>, SpaceRepository>();
-builder.Services.AddSingleton<IRepository<Tenant>, TenantRepository>();
+    builder.Services.AddControllers()
+        .AddJsonOptions(
+            options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
 
-var app = builder.Build();
+    // Add services to the container.
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    //builder.Services.AddControllers();
+    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
 
-app.UseHttpsRedirection();
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+    builder.Services.AddAutoMapper(cfg =>
+    {
+        cfg.AddProfile<MappingProfile>();
+    });
 
-app.UseAuthorization();
+    // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ Async пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    builder.Services.AddControllers(options =>
+    {
+        options.SuppressAsyncSuffixInActionNames = false;
+    });
 
-app.MapControllers();
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    //builder.Services.AddSingleton<IRepository<Landlord>, LandlordRepository>();
+    //builder.Services.AddSingleton<IRepository<RentalContract>, RentalContractRepository>();
+    //builder.Services.AddSingleton<IRepository<Space>, SpaceRepository>();
+    //builder.Services.AddSingleton<IRepository<Tenant>, TenantRepository>();
 
-app.Run();
+    var app = builder.Build();
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    /* app.UseSwaggerUI(options =>
+        {
+            options.SwaggerEndpoint("/openapi/v1.json", "v1");
+        });*/
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    app.Run();
+
+public partial class Program { }

@@ -4,7 +4,7 @@ namespace ApartmentRentals.Main.DTOs
 {
     public class SpaceListDTO
     {
-        public int Id { get; set; } = 0;
+        public string Id { get; set; } = "";
         public string Title { get; set; } = string.Empty;
         public SpaceType Category { get; set; }
         public decimal Price { get; set; }

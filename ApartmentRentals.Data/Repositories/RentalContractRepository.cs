@@ -7,7 +7,7 @@ namespace ApartmentRentals.Data.Repositories
     {
         private readonly List<RentalContract> _contracts = [
             new RentalContract {
-                Id = 1, SpaceId = 1, TenantId = 1,
+                Id = "1", SpaceId = "1", TenantId = "1",
                 StartDate = DateTime.Now, EndDate = DateTime.Now.AddMonths(6)
             }
         ];
@@ -16,12 +16,13 @@ namespace ApartmentRentals.Data.Repositories
 
         public Task<IEnumerable<RentalContract>> GetAllAsync() => Task.FromResult<IEnumerable<RentalContract>>(_contracts);
 
-        public Task<RentalContract?> GetByIdAsync(int id) =>
+        public Task<RentalContract?> GetByIdAsync(string id) =>
             Task.FromResult(_contracts.FirstOrDefault(c => c.Id == id));
 
         public Task CreateAsync(RentalContract entity)
         {
-            entity.Id = _nextId++;
+
+            entity.Id = Convert.ToString(_nextId++);
             _contracts.Add(entity);
 
             return Task.CompletedTask;
@@ -40,7 +41,7 @@ namespace ApartmentRentals.Data.Repositories
             return Task.FromResult(true);
         }
 
-        public Task<bool> DeleteByIdAsync(int id)
+        public Task<bool> DeleteByIdAsync(string id)
         {
             var contract = _contracts.FirstOrDefault(l => l.Id == id);
 
