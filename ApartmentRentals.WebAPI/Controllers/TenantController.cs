@@ -1,6 +1,5 @@
-﻿using ApartmentRentals.Main.DTOs;
-using ApartmentRentals.Main.Models;
-using ApartmentRentals.Main.Repositories;
+﻿using ApartmentRentals.Data.DTOs;
+using ApartmentRentals.Data.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SpaceStoreApi.Services;
@@ -21,10 +20,11 @@ public class TenantController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<Tenant>>> GetAllAsync()
+    public async Task<ActionResult<List<TenantDTO>>> GetAllAsync()
     {
         var t = await _tenantService.GetAllAsync();
-        return t.ToList();
+        var tDTO = _mapper.Map<IEnumerable<TenantDTO>>(t);
+        return tDTO.ToList();
     }
 
     [HttpGet("{id}")]
@@ -38,7 +38,7 @@ public class TenantController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateAsync(TenantDTO dto)
+    public async Task<IActionResult> CreateAsync(TenantNoIdDTO dto)
     {
         var Tenant = _mapper.Map<Tenant>(dto);
 
@@ -48,10 +48,9 @@ public class TenantController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(string id, TenantDTO dto)
+    public async Task<IActionResult> UpdateAsync(string id, TenantNoIdDTO dto)
     {
         var Tenant = _mapper.Map<Tenant>(dto);
-        Tenant.Id = id;
 
         var success = await _tenantService.UpdateAsync(id, Tenant);
 
@@ -61,7 +60,7 @@ public class TenantController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var success = await _tenantService.Delete(id);
+        var success = await _tenantService.DeleteByIdAsync(id);
 
         return success ? NoContent() : NotFound();
     }
@@ -74,7 +73,7 @@ public class TenantController : ControllerBase
         {
             await _tenantService.DeleteAsync(tenant.Id);
         }*/
-        await _tenantService.DeleteAll();
+        await _tenantService.DeleteAllAsync();
         return Ok();
     }
 }

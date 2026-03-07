@@ -1,7 +1,9 @@
-﻿namespace ApartmentRentals.Main.DTOs
+﻿namespace ApartmentRentals.Data.DTOs
 {
-    public class UserDTO
+    public abstract class UserDTO
     {
+        public string Id { get; set; }
+
         public string Surname { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
 

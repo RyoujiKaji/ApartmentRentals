@@ -1,6 +1,6 @@
-﻿using ApartmentRentals.Main.DTOs;
-using ApartmentRentals.Main.Models;
-using ApartmentRentals.Main.Repositories;
+﻿using ApartmentRentals.Data.DTOs;
+using ApartmentRentals.Data.DTOs;
+using ApartmentRentals.Data.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SpaceStoreApi.Services;
@@ -21,14 +21,15 @@ public class RentalContractController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<RentalContract>>> GetAllAsync()
+    public async Task<ActionResult<List<RentalContractDTO>>> GetAllAsync()
     {
         var r = await _rentalService.GetAllAsync();
-        return r.ToList();
+        var rDTO = _mapper.Map<IEnumerable<RentalContractDTO>>(r);
+        return rDTO.ToList();
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<RentalContract>> GetAsync(string id)
+    public async Task<ActionResult<RentalContractDTO>> GetAsync(string id)
     {
         var RentalContract = await _rentalService.GetByIdAsync(id);
 
@@ -38,22 +39,21 @@ public class RentalContractController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateAsync(RentalContractDTO dto)
+    public async Task<IActionResult> CreateAsync(RentalContractNoIdDTO dto)
     {
-        var RentalContract = _mapper.Map<RentalContract>(dto);
+        var rentalContract = _mapper.Map<RentalContract>(dto);
 
-        await _rentalService.CreateAsync(RentalContract);
+        await _rentalService.CreateAsync(rentalContract);
 
-        return CreatedAtAction(nameof(GetAsync), new { id = RentalContract.Id }, RentalContract);
+        return CreatedAtAction(nameof(GetAsync), new { id = rentalContract.Id }, rentalContract);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(string id, RentalContractDTO dto)
+    public async Task<IActionResult> UpdateAsync(string id, RentalContractNoIdDTO dto)
     {
-        var RentalContract = _mapper.Map<RentalContract>(dto);
-        RentalContract.Id = id;
+        var rentalContract = _mapper.Map<RentalContract>(dto);
 
-        var success = await _rentalService.UpdateAsync(id, RentalContract);
+        var success = await _rentalService.UpdateAsync(id, rentalContract);
 
         return success ? NoContent() : NotFound();
     }
@@ -61,8 +61,20 @@ public class RentalContractController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var success = await _rentalService.Delete(id);
+        var success = await _rentalService.DeleteByIdAsync(id);
 
         return success ? NoContent() : NotFound();
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeleteAll()
+    {
+        /*var tenants = await _tenantService.GetAllAsync();
+        foreach (var tenant in tenants)
+        {
+            await _tenantService.DeleteAsync(tenant.Id);
+        }*/
+        await _rentalService.DeleteAllAsync();
+        return Ok();
     }
 }

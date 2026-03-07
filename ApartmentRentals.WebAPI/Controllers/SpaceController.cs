@@ -1,6 +1,5 @@
-﻿using ApartmentRentals.Main.DTOs;
-using ApartmentRentals.Main.Models;
-using ApartmentRentals.Main.Repositories;
+﻿using ApartmentRentals.Data.DTOs;
+using ApartmentRentals.Data.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SpaceStoreApi.Services;
@@ -51,7 +50,7 @@ namespace ApartmentRentals.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync (SpaceCreateDTO s)
+        public async Task<IActionResult> CreateAsync (SpaceNoIdDTO s)
         {
             var space = _mapper.Map<Space>(s);
 
@@ -61,7 +60,7 @@ namespace ApartmentRentals.WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync (string id, SpaceCreateDTO s)
+        public async Task<IActionResult> UpdateAsync (string id, SpaceNoIdDTO s)
         {
             var space = _mapper.Map<Space>(s);
             space.Id = id;
@@ -75,9 +74,21 @@ namespace ApartmentRentals.WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            bool res = await _spaceService.Delete(id);
+            bool res = await _spaceService.DeleteByIdAsync(id);
 
             return res ? NoContent() : NotFound();
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAll()
+        {
+            /*var tenants = await _tenantService.GetAllAsync();
+            foreach (var tenant in tenants)
+            {
+                await _tenantService.DeleteAsync(tenant.Id);
+            }*/
+            await _spaceService.DeleteAllAsync();
+            return Ok();
         }
     }
 }

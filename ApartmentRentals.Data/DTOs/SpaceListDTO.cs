@@ -1,6 +1,4 @@
-﻿using ApartmentRentals.Main.Models;
-
-namespace ApartmentRentals.Main.DTOs
+﻿namespace ApartmentRentals.Data.DTOs
 {
     public class SpaceListDTO
     {

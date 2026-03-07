@@ -1,8 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System.Text.Json.Serialization;
 
-namespace ApartmentRentals.Main.Models
+namespace ApartmentRentals.Data.Models
 {
     public enum SpaceType { Apartment, Room, BedPlace, House, PartOfHouse}
     public enum HouseType { Brick, Wooden, Monolithic, Panel, Block, Stalinka }

@@ -1,4 +1,4 @@
-﻿namespace ApartmentRentals.Main.Models
+﻿namespace ApartmentRentals.Data.Models
 {
     public class Tenant:User
     {

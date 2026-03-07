@@ -1,16 +1,16 @@
 using ApartmentRentals.Data.Repositories;
-using ApartmentRentals.Main.Models;
-using ApartmentRentals.Main.Repositories;
+using ApartmentRentals.Data.Models;
 using ApartmentRentals.Models;
 
 using SpaceStoreApi.Services;
+using ApartmentRentals.WebAPI.Services;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ApartmentRentals.Tests")]
 
     var builder = WebApplication.CreateBuilder(args);
 
     // Add services to the container.
-    builder.Services.Configure<SpaceStoreDatabaseSettings>(
+    builder.Services.Configure<MongoDbContext>(
         builder.Configuration.GetSection("SpaceStoreDatabase"));
 
     builder.Services.AddSingleton<SpaceService>();
@@ -54,11 +54,11 @@ using SpaceStoreApi.Services;
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
-        app.UseSwaggerUI();
-    /* app.UseSwaggerUI(options =>
+       // app.UseSwaggerUI();
+     app.UseSwaggerUI(options =>
         {
             options.SwaggerEndpoint("/openapi/v1.json", "v1");
-        });*/
+        });
     }
 
     app.UseHttpsRedirection();

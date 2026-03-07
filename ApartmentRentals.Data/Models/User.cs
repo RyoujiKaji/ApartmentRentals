@@ -1,8 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System.Text.Json.Serialization;
 
-namespace ApartmentRentals.Main.Models
+namespace ApartmentRentals.Data.Models
 {
     public abstract class User
     {

@@ -1,8 +1,6 @@
-﻿using ApartmentRentals.Main.Models;
-
-namespace ApartmentRentals.Main.DTOs
+﻿namespace ApartmentRentals.Data.DTOs
 {
-    public class SpaceCreateDTO
+    public class SpaceNoIdDTO
     {
         // Основная инфо
         public SpaceType Category { get; set; }

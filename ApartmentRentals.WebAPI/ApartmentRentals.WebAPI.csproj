@@ -23,7 +23,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ApartmentRentals.Data\ApartmentRentals.Data.csproj" />
-    <ProjectReference Include="..\ApartmentRentals.Models\ApartmentRentals.Main.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,10 +1,11 @@
-using ApartmentRentals.Main.Models;
+using ApartmentRentals.Data.Models;
+using ApartmentRentals.Data.Repositories;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
 namespace SpaceStoreApi.Services;
 
-public class SpaceService
+public class SpaceService : IRepository<Space>
 {
     private readonly IMongoCollection<Space> _spaceCollection;
 
@@ -22,7 +23,7 @@ public class SpaceService
             spaceStoreDatabaseSettings.Value.SpaceCollectionName);
     }
 
-    public async Task<List<Space>> GetAllAsync() =>
+    public async Task<IEnumerable<Space>> GetAllAsync() =>
         await _spaceCollection.Find(_ => true).ToListAsync();
 
     public async Task<Space?> GetByIdAsync(string id) =>
@@ -40,11 +41,18 @@ public class SpaceService
         return result.ModifiedCount > 0;
     }
 
-    public async Task<bool> Delete(string id) {
+    public async Task<bool> DeleteByIdAsync(string id) {
         //await _spaceCollection.DeleteOneAsync(x => x.Id == /*int.Parse(id)*/ id);
         var result = await _spaceCollection.DeleteOneAsync(x => x.Id == id);
         
         // Возвращаем true, если документ был удалён (DeletedCount > 0)
+        return result.DeletedCount > 0;
+    }
+
+    public async Task<bool> DeleteAllAsync()
+    {
+        var result = await _spaceCollection.DeleteManyAsync(_ => true);
+
         return result.DeletedCount > 0;
     }
 }
