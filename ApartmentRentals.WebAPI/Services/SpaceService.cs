@@ -1,5 +1,6 @@
 using ApartmentRentals.Data.Models;
 using ApartmentRentals.Data.Repositories;
+using ApartmentRentals.WebAPI.Services;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
@@ -10,7 +11,7 @@ public class SpaceService : IRepository<Space>
     private readonly IMongoCollection<Space> _spaceCollection;
 
     public SpaceService(
-        IOptions<SpaceStoreDatabaseSettings> spaceStoreDatabaseSettings)
+        IOptions<MongoDbContext> spaceStoreDatabaseSettings)
     {
        
         var mongoClient = new MongoClient(

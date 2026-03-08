@@ -1,17 +1,8 @@
-
-using System.Net.Http.Json;
-using Xunit;
-using FluentAssertions;
 using System.Net;
-using System.Net.Http.Json;
-using Microsoft.AspNetCore.Mvc.Testing;
-
-using ApartmentRentals.Data.DTOs;
 using ApartmentRentals.Data.Models;  
 
 using System.Text;
 using System.Text.Json;
-using ApartmentRentals.Models;
 
 namespace ApartmentRentals.Tests;
 

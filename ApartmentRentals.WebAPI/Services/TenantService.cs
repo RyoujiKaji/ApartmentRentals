@@ -1,7 +1,8 @@
-using MongoDB.Driver;
-using Microsoft.Extensions.Options;
 using ApartmentRentals.Data.Models;
 using ApartmentRentals.Data.Repositories;
+using ApartmentRentals.WebAPI.Services;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 namespace SpaceStoreApi.Services;
 
@@ -10,7 +11,7 @@ public class TenantService : IRepository<Tenant>
     private readonly IMongoCollection<Tenant> _tenantCollection;
 
     public TenantService(
-        IOptions<SpaceStoreDatabaseSettings> tenantStoreDatabaseSettings)
+        IOptions<MongoDbContext> tenantStoreDatabaseSettings)
     {
        
         var mongoClient = new MongoClient(

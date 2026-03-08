@@ -1,5 +1,6 @@
 using ApartmentRentals.Data.Models;
 using ApartmentRentals.Data.Repositories;
+using ApartmentRentals.WebAPI.Services;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
@@ -10,7 +11,7 @@ public class RentalContractService: IRepository<RentalContract>
     private readonly IMongoCollection<RentalContract> _rentalContractCollection;
 
     public RentalContractService(
-        IOptions<SpaceStoreDatabaseSettings> rentalContractStoreDatabaseSettings)
+        IOptions<MongoDbContext> rentalContractStoreDatabaseSettings)
     {
        
         var mongoClient = new MongoClient(

@@ -40,13 +40,13 @@ namespace ApartmentRentals.WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Space>> GetAsync(string id)
+        public async Task<ActionResult<SpaceDTO>> GetAsync(string id)
         {
             var space = await _spaceService.GetByIdAsync(id);
 
             if (space == null) return NotFound();
 
-            return space;
+            return Ok(space);
         }
 
         [HttpPost]

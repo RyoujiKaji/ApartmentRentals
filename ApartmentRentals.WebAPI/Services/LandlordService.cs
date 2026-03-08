@@ -2,6 +2,7 @@ using MongoDB.Driver;
 using Microsoft.Extensions.Options;
 using ApartmentRentals.Data.Models;
 using ApartmentRentals.Data.Repositories;
+using ApartmentRentals.WebAPI.Services;
 
 namespace SpaceStoreApi.Services;
 
@@ -9,7 +10,7 @@ public class LandlordService: IRepository<Landlord>
 {
     private readonly IMongoCollection<Landlord> _landlordsCollection;
 
-    public LandlordService(IOptions<SpaceStoreDatabaseSettings> settings)
+    public LandlordService(IOptions<MongoDbContext> settings)
     {
         var client = new MongoClient(settings.Value.ConnectionString);
         var database = client.GetDatabase(settings.Value.DatabaseName);

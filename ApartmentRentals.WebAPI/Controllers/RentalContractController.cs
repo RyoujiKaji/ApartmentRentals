@@ -1,5 +1,4 @@
 ﻿using ApartmentRentals.Data.DTOs;
-using ApartmentRentals.Data.DTOs;
 using ApartmentRentals.Data.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
