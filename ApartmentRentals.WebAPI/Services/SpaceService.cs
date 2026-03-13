@@ -68,6 +68,7 @@ public class SpaceService : IRepository<Space>
     }
 
     public async Task<bool> UpdateAsync(string id, Space updatedSpace) {
+        updatedSpace.Id = id;
         var result = await _spaceCollection.ReplaceOneAsync(x => x.Id == id, updatedSpace);
         return result.ModifiedCount > 0;
     }

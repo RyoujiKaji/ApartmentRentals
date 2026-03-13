@@ -64,6 +64,7 @@ public class LandlordService: IRepository<Landlord>
 
     public async Task<bool> UpdateAsync(string id, Landlord landlord)
     {
+        landlord.Id = id;
         var result = await _landlordsCollection.ReplaceOneAsync(x => x.Id == id, landlord);
         return result.ModifiedCount > 0;
     }

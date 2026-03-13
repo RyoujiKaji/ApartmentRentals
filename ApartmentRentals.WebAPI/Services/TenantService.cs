@@ -67,18 +67,14 @@ public class TenantService : IRepository<Tenant>
 
     public async Task<bool> UpdateAsync(string id, Tenant updatedTenant)
     {
-        //await _spaceCollection.ReplaceOneAsync(x => x.Id == /*int.Parse(id)*/ id, updatedSpace);
+        updatedTenant.Id = id;
         var result = await _tenantCollection.ReplaceOneAsync(x => x.Id == id, updatedTenant);
-        // Возвращаем true, если документ был изменён (ModifiedCount > 0)
         return result.ModifiedCount > 0;
     }
 
     public async Task<bool> DeleteByIdAsync(string id)
     {
-        //await _spaceCollection.DeleteOneAsync(x => x.Id == /*int.Parse(id)*/ id);
         var result = await _tenantCollection.DeleteOneAsync(x => x.Id == id);
-
-        // Возвращаем true, если документ был удалён (DeletedCount > 0)
         return result.DeletedCount > 0;
     }
 
