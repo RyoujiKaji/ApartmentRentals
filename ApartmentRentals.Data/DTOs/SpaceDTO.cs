@@ -1,23 +1,7 @@
-﻿namespace ApartmentRentals.Data.DTOs
+﻿using ApartmentRentals.Data.Models;
+
+namespace ApartmentRentals.Data.DTOs
 {
-    public enum SpaceType { Apartment, Room, BedPlace, House, PartOfHouse}
-    public enum HouseType { Brick, Wooden, Monolithic, Panel, Block, Stalinka }
-    public enum RentalTerm { LongTerm, SeveralMonths, ShortTerm }
-
-    public class SpacePhoto
-    {
-        public string Url { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public bool IsMain { get; set; }
-    }
-
-    public class Area
-    {
-        public double Total { get; set; }
-        public double Kitchen { get; set; }
-        public double Living { get; set; }
-    }
-
     public class SpaceDTO
     {
         public string Id { get; set; }

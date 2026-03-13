@@ -3,6 +3,8 @@ using ApartmentRentals.Data.Repositories;
 using ApartmentRentals.WebAPI.Services;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using System.Reflection;
+using static ApartmentRentals.Data.Repositories.IRepository<ApartmentRentals.Data.Models.RentalContract>;
 
 namespace SpaceStoreApi.Services;
 
@@ -25,7 +27,37 @@ public class RentalContractService: IRepository<RentalContract>
     }
 
     public async Task<IEnumerable<RentalContract>> GetAllAsync() =>
-        await _rentalContractCollection.Find(_ => true).ToListAsync();
+        await _rentalContractCollection.Aggregate().Sample(SAMPLE_NUM).ToListAsync();
+
+    public async Task<IEnumerable<RentalContract>> GetFilteredByPropertyAsync(string propertyName, string value)
+    {
+        var property = typeof(RentalContract).GetProperty(propertyName,
+            BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+
+        if (property == null)
+            throw new PropertyFilterException($"Поле '{propertyName}' не найдено");
+
+        try
+        {
+            object convertedValue;
+            Type targetType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+
+            if (targetType.IsEnum)
+            {
+                convertedValue = Enum.Parse(targetType, value, true);
+            }
+            else
+            {
+                convertedValue = Convert.ChangeType(value, targetType);
+            }
+
+            return await _rentalContractCollection.Find(Builders<RentalContract>.Filter.Eq(property.Name, convertedValue)).ToListAsync();
+        }
+        catch (Exception)
+        {
+            throw new PropertyFilterException($"Неверный тип значения '{value}' для поля '{propertyName}'");
+        }
+    }
 
     public async Task<RentalContract?> GetByIdAsync(string id) =>
         await _rentalContractCollection.Find(x => x.Id == id).FirstOrDefaultAsync();

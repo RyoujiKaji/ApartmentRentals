@@ -1,5 +1,6 @@
 ﻿using ApartmentRentals.Data.DTOs;
 using ApartmentRentals.Data.Models;
+using ApartmentRentals.Data.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SpaceStoreApi.Services;
@@ -8,13 +9,11 @@ using SpaceStoreApi.Services;
 [ApiController]
 public class LandlordController : ControllerBase
 {
-    //private readonly IRepository<Landlord> _repository;
-    private readonly LandlordService _landlordService;
+    private readonly IRepository<Landlord> _landlordService;
     private readonly IMapper _mapper;
 
-    public LandlordController(LandlordService landlordService, IMapper mapper)
+    public LandlordController(IRepository<Landlord> landlordService, IMapper mapper)
     {
-        //_repository = repository;
         _landlordService = landlordService;
         _mapper = mapper;
     }
@@ -25,6 +24,21 @@ public class LandlordController : ControllerBase
         var l = await _landlordService.GetAllAsync();
         var lDTO = _mapper.Map<IEnumerable<LandlordDTO>>(l);
         return lDTO.ToList();
+    }
+
+    [HttpGet("filter")]
+    public async Task<IActionResult> GetFilteredByPropertyAsync([FromQuery] string propertyName, [FromQuery] string value)
+    {
+        try
+        {
+            var results = await _landlordService.GetFilteredByPropertyAsync(propertyName, value);
+            var dtoResults = _mapper.Map<IEnumerable<LandlordDTO>>(results);
+            return Ok(dtoResults);
+        }
+        catch (PropertyFilterException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet("{id}")]

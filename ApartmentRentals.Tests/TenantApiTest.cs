@@ -6,14 +6,14 @@ using System.Text.Json;
 
 namespace ApartmentRentals.Tests;
 
-public class TenantApiTests : TestsBase<Program>
+public class ApiTests : TestsBase<Program>
 {
     private readonly HttpClient _client;
     private readonly string _tenantUrl = "/api/Tenant";
     private readonly string _landlordUrl = "/api/Landlord";
     private readonly string _spaceUrl = "/api/Space";
     private readonly string _rentalContractUrl = "/api/RentalContract";
-    public TenantApiTests()
+    public ApiTests()
     {
         _client = CreateClient();
     }

@@ -1,5 +1,6 @@
 ﻿using ApartmentRentals.Data.DTOs;
 using ApartmentRentals.Data.Models;
+using ApartmentRentals.Data.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SpaceStoreApi.Services;
@@ -11,19 +12,13 @@ namespace ApartmentRentals.WebAPI.Controllers
     public class SpaceController : ControllerBase
     {
 
-        private readonly SpaceService _spaceService;
+        private readonly IRepository<Space> _spaceService;
         private readonly IMapper _mapper;
 
-        public SpaceController(SpaceService spaceService, IMapper mapper){
+        public SpaceController(IRepository<Space> spaceService, IMapper mapper){
              _spaceService = spaceService;
              _mapper = mapper;
         }
-        //private readonly IRepository<Space> _repository;
-       /* public SpaceController(IRepository<Space> repository, IMapper mapper)
-        {
-            _repository = repository;
-            _mapper = mapper;
-        }*/
 
         [HttpGet]
         public async Task<IActionResult> GetAllAsync([FromQuery] bool full = false)
@@ -37,6 +32,21 @@ namespace ApartmentRentals.WebAPI.Controllers
 
             var shortRes = _mapper.Map<IEnumerable<SpaceListDTO>>(res);
             return Ok(shortRes.ToList());
+        }
+
+        [HttpGet("filter")]
+        public async Task<IActionResult> GetFilteredByPropertyAsync([FromQuery] string propertyName, [FromQuery] string value)
+        {
+            try
+            {
+                var results = await _spaceService.GetFilteredByPropertyAsync(propertyName, value);
+                var dtoResults = _mapper.Map<IEnumerable<SpaceDTO>>(results);
+                return Ok(dtoResults);
+            }
+            catch (PropertyFilterException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("{id}")]

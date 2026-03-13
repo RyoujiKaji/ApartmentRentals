@@ -32,10 +32,10 @@ builder.Services.AddControllers(options =>
 builder.Services.Configure<MongoDbContext>(
     builder.Configuration.GetSection("SpaceStoreDatabase"));
 
-builder.Services.AddSingleton<SpaceService>();
-builder.Services.AddSingleton<RentalContractService>();
-builder.Services.AddSingleton<TenantService>();
-builder.Services.AddSingleton<LandlordService>();
+builder.Services.AddSingleton<IRepository<Landlord>, LandlordService>();
+builder.Services.AddSingleton<IRepository<RentalContract>, RentalContractService>();
+builder.Services.AddSingleton<IRepository<Space>, SpaceService>();
+builder.Services.AddSingleton<IRepository<Tenant>, TenantService>();
 
 var app = builder.Build();
 

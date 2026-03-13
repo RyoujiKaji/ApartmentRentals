@@ -1,20 +1,21 @@
 ﻿using ApartmentRentals.Data.DTOs;
 using ApartmentRentals.Data.Models;
+using ApartmentRentals.Data.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
 using SpaceStoreApi.Services;
+using System.Reflection;
 
 [Route("api/[controller]")]
 [ApiController]
 public class TenantController : ControllerBase
 {
-    //private readonly IRepository<Tenant> _repository;
-    private readonly TenantService _tenantService;
+    private readonly IRepository<Tenant> _tenantService;
     private readonly IMapper _mapper;
 
-    public TenantController(TenantService tenantService, IMapper mapper)
+    public TenantController(IRepository<Tenant> tenantService, IMapper mapper)
     {
-        //_repository = repository;
         _tenantService = tenantService;
         _mapper = mapper;
     }
@@ -34,7 +35,22 @@ public class TenantController : ControllerBase
 
         if (Tenant == null) return NotFound();
 
-        return Ok(Tenant);
+        return Ok(_mapper.Map<TenantDTO>(Tenant));
+    }
+
+    [HttpGet("filter")]
+    public async Task<IActionResult> GetFilteredByPropertyAsync([FromQuery] string propertyName, [FromQuery] string value)
+    {
+        try
+        {
+            var results = await _tenantService.GetFilteredByPropertyAsync(propertyName, value);
+            var dtoResults = _mapper.Map<IEnumerable<TenantDTO>>(results);
+            return Ok(dtoResults);
+        }
+        catch (PropertyFilterException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPost]
@@ -65,7 +81,7 @@ public class TenantController : ControllerBase
         return success ? NoContent() : NotFound();
     }
 
-    [HttpDelete] 
+    [HttpDelete]
     public async Task<IActionResult> DeleteAll()
     {
         /*var tenants = await _tenantService.GetAllAsync();
