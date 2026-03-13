@@ -72,7 +72,7 @@ public class ApiTests : TestsBase<Program>
 
     // Тест 3: Удаление всех элементов
     [Fact]
-    public async Task DeleteAllTenants()
+    public async Task DeleteAll()
     {
         // Удаляем всё
         var deleteResponse = await _client.DeleteAsync(_tenantUrl);
