@@ -4,6 +4,7 @@ using ApartmentRentals.Models;
 
 using SpaceStoreApi.Services;
 using ApartmentRentals.WebAPI.Services;
+using Prometheus;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ApartmentRentals.Tests")]
 
@@ -37,6 +38,9 @@ builder.Services.AddSingleton<RentalContractService>();
 builder.Services.AddSingleton<TenantService>();
 builder.Services.AddSingleton<LandlordService>();
 
+builder.Services.AddMetrics();
+builder.Services.AddHostedService<MetricsUpdateService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -49,6 +53,10 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseHttpMetrics();
+
+app.MapMetrics();
 
 app.MapControllers();
 
