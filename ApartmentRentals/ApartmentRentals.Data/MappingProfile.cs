@@ -14,11 +14,6 @@ namespace ApartmentRentals.Models
             CreateMap<RentalContractNoIdDTO, RentalContract>();
             CreateMap<TenantNoIdDTO, Tenant>();
             CreateMap<UserNoIdDTO, User>();
-            CreateMap<Space, SpaceDTO>();
-            CreateMap<Landlord, LandlordDTO>();
-            CreateMap<RentalContract, RentalContractDTO>();
-            CreateMap<Tenant, TenantDTO>();
-            CreateMap<User, UserDTO>();
         }
     }
 }

@@ -1,11 +1,8 @@
 ﻿using ApartmentRentals.Data.DTOs;
 using ApartmentRentals.Data.Models;
-using ApartmentRentals.Data.Repositories;
+using ApartmentRentals.WebAPI.Services.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
-using SpaceStoreApi.Services;
-using System.Reflection;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -21,12 +18,7 @@ public class TenantController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<TenantDTO>>> GetAllAsync()
-    {
-        var t = await _tenantService.GetAllAsync();
-        var tDTO = _mapper.Map<IEnumerable<TenantDTO>>(t);
-        return tDTO.ToList();
-    }
+    public async Task<ActionResult<List<Tenant>>> GetAllAsync() => (await _tenantService.GetAllAsync()).ToList();
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Tenant>> GetAsync(string id)
@@ -35,7 +27,7 @@ public class TenantController : ControllerBase
 
         if (Tenant == null) return NotFound();
 
-        return Ok(_mapper.Map<TenantDTO>(Tenant));
+        return Ok(Tenant);
     }
 
     [HttpGet("filter")]
@@ -44,8 +36,7 @@ public class TenantController : ControllerBase
         try
         {
             var results = await _tenantService.GetFilteredByPropertyAsync(propertyName, value);
-            var dtoResults = _mapper.Map<IEnumerable<TenantDTO>>(results);
-            return Ok(dtoResults);
+            return Ok(results);
         }
         catch (PropertyFilterException ex)
         {
@@ -64,31 +55,15 @@ public class TenantController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(string id, TenantNoIdDTO dto)
-    {
-        var Tenant = _mapper.Map<Tenant>(dto);
-
-        var success = await _tenantService.UpdateAsync(id, Tenant);
-
-        return success ? NoContent() : NotFound();
-    }
+    public async Task<IActionResult> UpdateAsync(string id, TenantNoIdDTO dto) =>
+        await _tenantService.UpdateAsync(id, _mapper.Map<Tenant>(dto)) ? NoContent() : NotFound();
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(string id)
-    {
-        var success = await _tenantService.DeleteByIdAsync(id);
-
-        return success ? NoContent() : NotFound();
-    }
+    public async Task<IActionResult> Delete(string id) => await _tenantService.DeleteByIdAsync(id) ? NoContent() : NotFound();
 
     [HttpDelete]
     public async Task<IActionResult> DeleteAll()
     {
-        /*var tenants = await _tenantService.GetAllAsync();
-        foreach (var tenant in tenants)
-        {
-            await _tenantService.DeleteAsync(tenant.Id);
-        }*/
         await _tenantService.DeleteAllAsync();
         return Ok();
     }

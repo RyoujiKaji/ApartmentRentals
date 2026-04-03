@@ -1,9 +1,12 @@
-using ApartmentRentals.Data.Repositories;
 using ApartmentRentals.Data.Models;
 using ApartmentRentals.Models;
-
-using SpaceStoreApi.Services;
 using ApartmentRentals.WebAPI.Services;
+using ApartmentRentals.WebAPI.Services.Repositories;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
+using Prometheus;
+using StackExchange.Redis;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ApartmentRentals.Tests")]
 
@@ -32,10 +35,57 @@ builder.Services.AddControllers(options =>
 builder.Services.Configure<MongoDbContext>(
     builder.Configuration.GetSection("SpaceStoreDatabase"));
 
-builder.Services.AddSingleton<IRepository<Landlord>, LandlordService>();
-builder.Services.AddSingleton<IRepository<RentalContract>, RentalContractService>();
-builder.Services.AddSingleton<IRepository<Space>, SpaceService>();
-builder.Services.AddSingleton<IRepository<Tenant>, TenantService>();
+builder.Services.AddSingleton<IMongoClient>(sp =>
+{
+    return new MongoClient(sp.GetRequiredService<IOptions<MongoDbContext>>().Value.ConnectionString);
+});
+
+// регистрируем кэш
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["RedisCache:Configuration"];
+    options.InstanceName = builder.Configuration["RedisCache:InstanceName"];
+});
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect(builder.Configuration["RedisCache:Configuration"]));
+
+// === Регистрация репозиториев с данными ===
+builder.Services.AddScoped<MongoDbRepository<Landlord>>();
+builder.Services.AddScoped<IRepository<Landlord>>(provider =>
+{
+    var r = provider.GetRequiredService<MongoDbRepository<Landlord>>();
+    var c = provider.GetRequiredService<IDistributedCache>();
+    return new CachedRepository<Landlord>(r, c);
+});
+
+builder.Services.AddScoped<MongoDbRepository<RentalContract>>();
+builder.Services.AddScoped<IRepository<RentalContract>>(provider =>
+{
+    var r = provider.GetRequiredService<MongoDbRepository<RentalContract>>();
+    var c = provider.GetRequiredService<IDistributedCache>();
+    return new CachedRepository<RentalContract>(r, c);
+});
+
+builder.Services.AddScoped<MongoDbRepository<Space>>();
+builder.Services.AddScoped<IRepository<Space>>(provider =>
+{
+    var r = provider.GetRequiredService<MongoDbRepository<Space>>();
+    var c = provider.GetRequiredService<IDistributedCache>();
+    return new CachedRepository<Space>(r, c);
+});
+
+builder.Services.AddScoped<MongoDbRepository<Tenant>>();
+builder.Services.AddScoped<IRepository<Tenant>>(provider =>
+{
+    var r = provider.GetRequiredService<MongoDbRepository<Tenant>>();
+    var c = provider.GetRequiredService<IDistributedCache>();
+    return new CachedRepository<Tenant>(r, c);
+});
+
+// =========
+
+builder.Services.AddMetrics();
+builder.Services.AddHostedService<MetricsUpdateService>();
 
 var app = builder.Build();
 
@@ -49,6 +99,10 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseHttpMetrics();
+
+app.MapMetrics();
 
 app.MapControllers();
 

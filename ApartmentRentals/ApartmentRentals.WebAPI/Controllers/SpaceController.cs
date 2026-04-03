@@ -1,9 +1,9 @@
 ﻿using ApartmentRentals.Data.DTOs;
 using ApartmentRentals.Data.Models;
-using ApartmentRentals.Data.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using SpaceStoreApi.Services;
+using Microsoft.Extensions.Caching.Distributed;
+using ApartmentRentals.WebAPI.Services.Repositories;
 
 namespace ApartmentRentals.WebAPI.Controllers
 {
@@ -15,22 +15,23 @@ namespace ApartmentRentals.WebAPI.Controllers
         private readonly IRepository<Space> _spaceService;
         private readonly IMapper _mapper;
 
-        public SpaceController(IRepository<Space> spaceService, IMapper mapper){
-             _spaceService = spaceService;
-             _mapper = mapper;
+        public SpaceController(IRepository<Space> spaceService, IMapper mapper)
+        {
+            _spaceService = spaceService;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllAsync([FromQuery] bool full = false)
         {
-            var res = await _spaceService.GetAllAsync();
+            var spaces = await _spaceService.GetAllAsync();
 
             if (full)
             {
-                return Ok(res.ToList());
+                return Ok(spaces.ToList());
             }
 
-            var shortRes = _mapper.Map<IEnumerable<SpaceListDTO>>(res);
+            var shortRes = _mapper.Map<IEnumerable<SpaceListDTO>>(spaces);
             return Ok(shortRes.ToList());
         }
 
@@ -40,8 +41,7 @@ namespace ApartmentRentals.WebAPI.Controllers
             try
             {
                 var results = await _spaceService.GetFilteredByPropertyAsync(propertyName, value);
-                var dtoResults = _mapper.Map<IEnumerable<SpaceDTO>>(results);
-                return Ok(dtoResults);
+                return Ok(results);
             }
             catch (PropertyFilterException ex)
             {
@@ -50,7 +50,7 @@ namespace ApartmentRentals.WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<SpaceDTO>> GetAsync(string id)
+        public async Task<ActionResult<Space>> GetAsync(string id)
         {
             var space = await _spaceService.GetByIdAsync(id);
 
@@ -60,7 +60,7 @@ namespace ApartmentRentals.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync (SpaceNoIdDTO s)
+        public async Task<IActionResult> CreateAsync(SpaceNoIdDTO s)
         {
             var space = _mapper.Map<Space>(s);
 
@@ -70,33 +70,16 @@ namespace ApartmentRentals.WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync (string id, SpaceNoIdDTO s)
-        {
-            var space = _mapper.Map<Space>(s);
-            space.Id = id;
-
-            var res = await _spaceService.UpdateAsync(id, space);
-
-            return res ? NoContent() : NotFound();
-        }
+        public async Task<IActionResult> UpdateAsync(string id, SpaceNoIdDTO s) => 
+            await _spaceService.UpdateAsync(id, _mapper.Map<Space>(s)) ? NoContent() : NotFound();
 
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
-        {
-            bool res = await _spaceService.DeleteByIdAsync(id);
-
-            return res ? NoContent() : NotFound();
-        }
+        public async Task<IActionResult> Delete(string id) => await _spaceService.DeleteByIdAsync(id) ? NoContent() : NotFound();
 
         [HttpDelete]
         public async Task<IActionResult> DeleteAll()
         {
-            /*var tenants = await _tenantService.GetAllAsync();
-            foreach (var tenant in tenants)
-            {
-                await _tenantService.DeleteAsync(tenant.Id);
-            }*/
             await _spaceService.DeleteAllAsync();
             return Ok();
         }
