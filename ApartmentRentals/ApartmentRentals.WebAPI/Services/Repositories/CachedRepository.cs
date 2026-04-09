@@ -6,39 +6,39 @@ namespace ApartmentRentals.WebAPI.Services.Repositories
 {
     public class CachedRepository<T> : IRepository<T> where T : IModel
     {
-        private IRepository<T> repository;
-        private IDistributedCache cache;
-        private readonly string cacheNamespace = typeof(T).Name;
+        private IRepository<T> Repository { get; set; }
+        private IDistributedCache Cache { get; set; }
 
-        private const int absoluteCachedTime = 2;
-        private const int slidingCachedTime = 1;
+        private readonly string CACHE_NAMESPACE = typeof(T).Name;
+        private const int ABSOLUTE_CACHED_TIME = 2;
+        private const int SLIDING_CACHED_TIME = 1;
 
-        public CachedRepository(IRepository<T> spaceRepository, IDistributedCache cache)
+        public CachedRepository(IRepository<T> repository, IDistributedCache cache)
         {
-            this.repository = spaceRepository;
-            this.cache = cache;
+            Repository = repository;
+            Cache = cache;
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
             IEnumerable<T> objects;
-            var cacheKey = $"{cacheNamespace}:all";
+            var cacheKey = $"{CACHE_NAMESPACE}:all";
 
-            var cachedData = await cache.GetStringAsync(cacheKey);
+            var cachedData = await Cache.GetStringAsync(cacheKey);
             if (!string.IsNullOrEmpty(cachedData))
             {
                 objects = JsonSerializer.Deserialize<List<T>>(cachedData) ?? new List<T>();
             }
             else
             {
-                objects = await repository.GetAllAsync();
+                objects = await Repository.GetAllAsync();
 
                 if (objects.Count() != 0)
                 {
                     var serializedData = JsonSerializer.Serialize(objects);
                     var cacheOptions = new DistributedCacheEntryOptions()
-                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(absoluteCachedTime));
-                    await cache.SetStringAsync(cacheKey, serializedData, cacheOptions);
+                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(ABSOLUTE_CACHED_TIME));
+                    await Cache.SetStringAsync(cacheKey, serializedData, cacheOptions);
                 }
             }
 
@@ -48,23 +48,23 @@ namespace ApartmentRentals.WebAPI.Services.Repositories
         public async Task<IEnumerable<T>> GetFilteredByPropertyAsync(string propertyName, string value)
         {
             IEnumerable<T> objects;
-            var cacheKey = $"{cacheNamespace}:filter:{propertyName}:{value}";
+            var cacheKey = $"{CACHE_NAMESPACE}:filter:{propertyName}:{value}";
 
-            var cachedData = await cache.GetStringAsync(cacheKey);
+            var cachedData = await Cache.GetStringAsync(cacheKey);
             if (!string.IsNullOrEmpty(cachedData))
             {
                 objects = JsonSerializer.Deserialize<List<T>>(cachedData) ?? new List<T>();
             }
             else
             {
-                objects = await repository.GetFilteredByPropertyAsync(propertyName, value);
+                objects = await Repository.GetFilteredByPropertyAsync(propertyName, value);
 
                 if (objects.Count() != 0)
                 {
                     var serializedData = JsonSerializer.Serialize(objects);
                     var cacheOptions = new DistributedCacheEntryOptions()
-                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(absoluteCachedTime));
-                    await cache.SetStringAsync(cacheKey, serializedData, cacheOptions);
+                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(ABSOLUTE_CACHED_TIME));
+                    await Cache.SetStringAsync(cacheKey, serializedData, cacheOptions);
                 }
             }
 
@@ -74,39 +74,39 @@ namespace ApartmentRentals.WebAPI.Services.Repositories
         public async Task<T?> GetByIdAsync(string id)
         {
             T? _object;
-            var cacheKey = $"{cacheNamespace}:id:{id}";
+            var cacheKey = $"{CACHE_NAMESPACE}:id:{id}";
 
-            var cachedData = await cache.GetStringAsync(cacheKey);
+            var cachedData = await Cache.GetStringAsync(cacheKey);
             if (!string.IsNullOrEmpty(cachedData))
             {
                 _object = JsonSerializer.Deserialize<T>(cachedData);
             }
             else
             {
-                _object = await repository.GetByIdAsync(id);
+                _object = await Repository.GetByIdAsync(id);
 
                 if (_object != null)
                 {
                     var serializedData = JsonSerializer.Serialize(_object);
                     var cacheOptions = new DistributedCacheEntryOptions()
-                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(absoluteCachedTime))
-                        .SetSlidingExpiration(TimeSpan.FromMinutes(slidingCachedTime));
-                    await cache.SetStringAsync(cacheKey, serializedData, cacheOptions);
+                       // .SetAbsoluteExpiration(TimeSpan.FromMinutes(ABSOLUTE_CACHED_TIME))
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(SLIDING_CACHED_TIME));
+                    await Cache.SetStringAsync(cacheKey, serializedData, cacheOptions);
                 }
             }
 
             return _object;
         }
 
-        public async Task CreateAsync(T newSpace) => await repository.CreateAsync(newSpace);
+        public async Task CreateAsync(T newSpace) => await Repository.CreateAsync(newSpace);
 
         public async Task<bool> UpdateAsync(string id, T updatedSpace)
         {
-            var success = await repository.UpdateAsync(id, updatedSpace);
+            var success = await Repository.UpdateAsync(id, updatedSpace);
             if (success)
             {
-                var cacheKey = $"{cacheNamespace}:id:{id}";
-                await cache.RemoveAsync(cacheKey);
+                var cacheKey = $"{CACHE_NAMESPACE}:id:{id}";
+                await Cache.RemoveAsync(cacheKey);
             }
 
             return success;
@@ -114,16 +114,16 @@ namespace ApartmentRentals.WebAPI.Services.Repositories
 
         public async Task<bool> DeleteByIdAsync(string id)
         {
-            var success = await repository.DeleteByIdAsync(id);
+            var success = await Repository.DeleteByIdAsync(id);
             if (success)
             {
-                var cacheKey = $"{cacheNamespace}:id:{id}";
-                await cache.RemoveAsync(cacheKey);
+                var cacheKey = $"{CACHE_NAMESPACE}:id:{id}";
+                await Cache.RemoveAsync(cacheKey);
             }
 
             return success;
         }
 
-        public async Task<bool> DeleteAllAsync() => await repository.DeleteAllAsync();
+        public async Task<bool> DeleteAllAsync() => await Repository.DeleteAllAsync();
     }
 }

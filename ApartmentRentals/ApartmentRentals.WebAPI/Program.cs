@@ -31,16 +31,15 @@ builder.Services.AddControllers(options =>
     options.SuppressAsyncSuffixInActionNames = false;
 });
 
-// Add services to the container.
+// === Регистрируем бд ===
 builder.Services.Configure<MongoDbContext>(
     builder.Configuration.GetSection("SpaceStoreDatabase"));
-
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
     return new MongoClient(sp.GetRequiredService<IOptions<MongoDbContext>>().Value.ConnectionString);
 });
 
-// регистрируем кэш
+// === регистрируем кэш ===
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration["RedisCache:Configuration"];
